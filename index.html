@@ -2,165 +2,270 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10111b">
-  <title>Rocket League Tracker</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: #10111b; color: #f4f5ff;
-      font-family: system-ui, sans-serif; padding: 20px;
-    }
-    .app { max-width: 600px; margin: auto; }
-    h1 { font-size: 27px; margin-bottom: 4px; }
-    .muted { color: #999db8; }
-    .card {
-      background: #1b1d2c; border: 1px solid #30334b;
-      padding: 18px; border-radius: 17px; margin: 16px 0;
-    }
-    .rank { font-size: 30px; font-weight: 800; color: #70caff; }
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .stat { background: #25283a; padding: 14px; border-radius: 12px; }
-    .number { font-size: 24px; font-weight: 750; }
-    input, select, button {
-      width: 100%; padding: 13px; border-radius: 10px;
-      border: 1px solid #393d59; margin-top: 9px;
-      background: #141624; color: white; font: inherit;
-    }
-    button {
-      background: #56b9ff; color: #10111b;
-      border: none; font-weight: 750; cursor: pointer;
-    }
-    button.loss { background: #ff7189; }
-    .match {
-      display: flex; justify-content: space-between; gap: 10px;
-      padding: 12px 0; border-bottom: 1px solid #30334b;
-    }
-    .win { color: #65e6a2; } .lose { color: #ff7189; }
-    .small { font-size: 13px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>RL Tracker</title>
+<style>
+:root{--bg:#0b1020;--card:#121a2c;--card2:#18233a;--line:#263653;--blue:#57b8ff;--cyan:#78f0ff;--text:#edf5ff;--muted:#8e9db8;--green:#62e6a4;--red:#ff708a}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#1c3961 0,transparent 42%),var(--bg);color:var(--text);font:15px system-ui,-apple-system,sans-serif;min-height:100vh}
+.app{width:min(100%,650px);margin:auto;padding:20px 16px 34px}
+header{display:flex;align-items:center;gap:13px;margin:8px 0 23px}
+.logo{width:49px;height:49px;flex-shrink:0;border-radius:16px;display:grid;place-items:center;font-size:24px;font-weight:900;color:#081323;background:linear-gradient(140deg,#8cecff,#4199ff);box-shadow:0 0 28px #429dff38}
+h1{font-size:21px;letter-spacing:1.2px;margin:0}
+.sub{font-size:12px;color:var(--muted);margin-top:3px}
+.pill{margin-left:auto;font-size:10px;letter-spacing:1px;color:var(--cyan);border:1px solid #335674;padding:6px 9px;border-radius:30px}
+.card{background:linear-gradient(145deg,#162137,#111827);border:1px solid #293852;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px #0002}
+.hero{position:relative;overflow:hidden;background:linear-gradient(125deg,#173a60,#14243d 55%,#151a30);border-color:#315579}
+.hero:after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;right:-90px;top:-105px;background:#5cbaff15;pointer-events:none}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:1.7px;color:#a8c8ed;text-transform:uppercase}
+.rankname{font-size:28px;line-height:1.2;font-weight:850;margin:9px 0 4px;letter-spacing:-.7px}
+.rankmeta{font-size:13px;color:#b6c9e5}
+.mmrline{display:flex;align-items:end;justify-content:space-between;gap:10px;margin:20px 0 12px}
+.mmrnum{font-size:33px;font-weight:850;letter-spacing:-1px}
+.mmrnum small{font-size:12px;font-weight:500;color:var(--muted);letter-spacing:0}
+.progress{height:6px;background:#ffffff13;border-radius:8px;overflow:hidden;margin:12px 0 8px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:8px;transition:width .3s}
+.progresslabel{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#adc2dd}
+.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:23px 2px 12px}
+.sectionhead h2{font-size:14px;margin:0;letter-spacing:.3px}
+.sectionhead span{font-size:11px;color:var(--muted)}
+label{display:block;font-size:11px;color:var(--muted);margin:11px 0 6px}
+input,select{width:100%;min-width:0;background:#0c1424;color:var(--text);border:1px solid #30415f;border-radius:11px;padding:12px;font:inherit;outline:none}
+input:focus,select:focus{border-color:var(--blue)}
+button{border:0;border-radius:11px;padding:12px;font:700 13px system-ui;cursor:pointer;transition:transform .12s,filter .12s}
+button:active{transform:scale(.98)}
+.primary{background:linear-gradient(120deg,#65d7ff,#599eff);color:#071426}
+.secondary{background:#202e46;color:var(--text);border:1px solid #354866}
+.danger{background:#3a2030;color:#ff9bae;border:1px solid #603044}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#131e31;border:1px solid #243550;padding:15px;border-radius:16px;box-shadow:0 7px 18px #00012}
+.stat .label{font-size:11px;color:var(--muted)}
+.stat .value{font-size:27px;font-weight:850;margin-top:4px;letter-spacing:-.7px}
+.stat .detail{font-size:11px;color:var(--muted);margin-top:3px}
+.blue{color:var(--blue)}.green{color:var(--green)}.red{color:var(--red)}
+.chart{width:100%;height:160px;display:block;overflow:visible}
+.chartwrap{padding:12px 0 0}
+.chartnote{font-size:11px;color:var(--muted);text-align:center;margin-top:6px}
+.quote{background:linear-gradient(135deg,#182e48,#151b30);border:1px solid #304967;border-radius:19px;padding:19px;margin:20px 0 14px}
+.quoteicon{font-size:22px;color:var(--cyan)}
+.quotetext{font-size:16px;font-weight:700;line-height:1.55;margin:8px 0}
+.quotefoot{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.formgrid .full{grid-column:1/-1}
+.buttonrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.buttonrow button{padding:14px 6px}
+.historyrow{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid #26334a}
+.historyrow:last-child{border-bottom:0}
+.resultdot{width:36px;height:36px;flex-shrink:0;display:grid;place-items:center;border-radius:12px;font-weight:900}
+.resultdot.w{background:#153c36;color:var(--green)}.resultdot.l{background:#42232f;color:var(--red)}
+.matchinfo{min-width:0;flex:1}
+.matchtitle{font-size:13px;font-weight:750}
+.matchdate{font-size:11px;color:var(--muted);margin-top:3px}
+.matchscore{text-align:right;font-size:14px;font-weight:800}
+.matchmmr{font-size:11px;color:var(--muted);margin-top:3px}
+.smallbtn{font-size:10px;padding:7px 8px;background:#253149;color:#b7c7e0;margin-left:4px}
+.empty{text-align:center;padding:22px 8px;color:var(--muted);font-size:12px;line-height:1.7}
+footer{text-align:center;color:#64748b;font-size:10px;letter-spacing:1px;padding:14px 0 0}
+@media(min-width:500px){.app{padding:28px 22px 40px}.rankname{font-size:32px}}
+</style>
 </head>
 <body>
 <main class="app">
-  <h1>🚀 RL TRACKER</h1>
-  <div class="muted">Twój Rocket League dashboard</div>
+<header>
+  <div class="logo">RL</div>
+  <div><h1>ROCKET LEAGUE</h1><div class="sub">TRACKER · YOUR NEXT RANK UP</div></div>
+  <div class="pill">SEASON GRIND</div>
+</header>
 
-  <section class="card">
-    <div class="muted">TWÓJ RANK</div>
-    <div class="rank" id="rank">Platinum II</div>
-    <label for="rankSelect">Ustaw aktualną rangę</label>
-    <select id="rankSelect">
-      <option>Bronze I</option><option>Bronze II</option>
-      <option>Bronze III</option><option>Silver I</option>
-      <option>Silver II</option><option>Silver III</option>
-      <option>Gold I</option><option>Gold II</option>
-      <option>Gold III</option><option>Platinum I</option>
-      <option selected>Platinum II</option><option>Platinum III</option>
-      <option>Diamond I</option><option>Diamond II</option>
-      <option>Diamond III</option><option>Champion I</option>
-      <option>Champion II</option><option>Champion III</option>
-      <option>Grand Champion I</option><option>Grand Champion II</option>
-      <option>Grand Champion III</option><option>Supersonic Legend</option>
-    </select>
-    <label for="mode">Tryb gry</label>
-    <select id="mode">
-      <option>2v2</option><option>1v1</option><option>3v3</option>
-    </select>
-  </section>
+<section class="card hero">
+  <div class="eyebrow">CURRENT RANK · <span id="heroMode">2V2</span></div>
+  <div class="rankname" id="heroRank">Platinum</div>
+  <div class="rankmeta" id="heroDivision">Division II</div>
+  <div class="mmrline"><div><div class="eyebrow">YOUR MMR</div><div class="mmrnum" id="heroMMR">— <small>MMR</small></div></div><div style="text-align:right"><div class="eyebrow">WIN RATE</div><div class="mmrnum blue" id="heroWR">0%</div></div></div>
+  <div class="progress"><div id="rankbar"></div></div>
+  <div class="progresslabel"><span id="progressLeft">Keep playing to track progress</span><span id="progressRight">RANK UP</span></div>
+</section>
 
-  <section class="stats">
-    <div class="stat"><div class="muted small">Rozegrane</div>
-      <div class="number" id="played">0</div></div>
-    <div class="stat"><div class="muted small">Win rate</div>
-      <div class="number" id="rate">0%</div></div>
-    <div class="stat"><div class="muted small">Wygrane</div>
-      <div class="number win" id="wins">0</div></div>
-    <div class="stat"><div class="muted small">Przegrane</div>
-      <div class="number lose" id="losses">0</div></div>
-  </section>
+<div class="sectionhead"><h2>🏆 Rank setup</h2><span>Per playlist</span></div>
+<section class="card">
+  <label for="mode">Playlist</label>
+  <select id="mode"><option value="2v2">Doubles · 2v2</option><option value="1v1">Duels · 1v1</option><option value="3v3">Standard · 3v3</option></select>
+  <div class="formgrid">
+    <div><label for="rank">Rank</label><select id="rank"></select></div>
+    <div><label for="division">Division</label><select id="division"><option value="1">Division I</option><option value="2">Division II</option><option value="3">Division III</option><option value="4">Division IV</option></select></div>
+    <div class="full"><label for="mmr">Current MMR (optional)</label><input id="mmr" type="number" inputmode="numeric" min="0" placeholder="e.g. 785"></div>
+  </div>
+  <button class="primary" id="saveRank" style="width:100%;margin-top:14px">Save rank settings</button>
+</section>
 
-  <section class="card">
-    <h3>📊 Dodaj mecz</h3>
-    <label for="score">Wynik meczu</label>
-    <input id="score" placeholder="Np. 3-1" maxlength="9">
-    <button id="addWin">✅ Wygrana</button>
-    <button id="addLoss" class="loss">❌ Przegrana</button>
-  </section>
+<div class="sectionhead"><h2>📊 Performance</h2><span id="modeLabel">2v2 stats</span></div>
+<section class="stats">
+  <div class="stat"><div class="label">MATCHES PLAYED</div><div class="value" id="played">0</div><div class="detail">In selected playlist</div></div>
+  <div class="stat"><div class="label">WIN RATE</div><div class="value blue" id="wr">0%</div><div class="detail" id="wrDetail">No matches yet</div></div>
+  <div class="stat"><div class="label">WINS</div><div class="value green" id="wins">0</div><div class="detail" id="streak">Start your streak</div></div>
+  <div class="stat"><div class="label">LOSSES</div><div class="value red" id="losses">0</div><div class="detail">Every game is data</div></div>
+</section>
 
-  <section class="card">
-    <h3>📜 Historia meczów</h3>
-    <button id="clear" style="background:#30334b;color:white">
-      Wyczyść historię
-    </button>
-    <div id="history" class="muted">Brak rozegranych meczów.</div>
-  </section>
-  <p class="muted small">RL Tracker • Statystyki zapisują się na tym urządzeniu.</p>
+<div class="sectionhead"><h2>📈 MMR progression</h2><span>Match history</span></div>
+<section class="card">
+  <div class="chartwrap"><svg id="chart" class="chart" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="MMR progression chart"></svg></div>
+  <div id="chartNote" class="chartnote">Add match MMR values to build your graph.</div>
+</section>
+
+<div class="sectionhead"><h2>🎮 Log a match</h2><span>Manual tracking</span></div>
+<section class="card">
+  <div class="formgrid">
+    <div><label for="score">Score (optional)</label><input id="score" placeholder="3-1" maxlength="9"></div>
+    <div><label for="afterMMR">MMR after match (optional)</label><input id="afterMMR" type="number" inputmode="numeric" min="0" placeholder="e.g. 792"></div>
+  </div>
+  <div class="buttonrow"><button class="primary" id="addWin">✓  WIN</button><button class="danger" id="addLoss">✕  LOSS</button></div>
+  <div class="sub" style="margin-top:10px">Add your MMR after each match to make the graph useful.</div>
+</section>
+
+<div class="sectionhead"><h2>🧾 Recent matches</h2><span id="historyCount">0 games</span></div>
+<section class="card" id="history"><div class="empty">No matches yet.<br>Queue up, then log your first game.</div></section>
+
+<section class="quote">
+  <div class="quoteicon">✦</div>
+  <div class="quotefoot">Daily rank-up reminder</div>
+  <div class="quotetext" id="quote">One good game at a time.</div>
+  <div class="quotefoot" id="quoteDay"></div>
+</section>
+<footer>RL TRACKER · BUILT FOR THE GRIND</footer>
 </main>
 
 <script>
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
+const ranks=["Bronze I","Bronze II","Bronze III","Silver I","Silver II","Silver III","Gold I","Gold II","Gold III","Platinum I","Platinum II","Platinum III","Diamond I","Diamond II","Diamond III","Champion I","Champion II","Champion III","Grand Champion I","Grand Champion II","Grand Champion III","Supersonic Legend"];
+const quotes=[
+"One good game at a time. Stack the wins.",
+"You don't rank up by tilting. Reset, breathe, queue.",
+"Consistency beats the occasional insane game.",
+"Bad game? Data collected. Next kickoff.",
+"Play the ball, not the last mistake.",
+"Every loss can teach you something. Take the lesson, leave the tilt.",
+"Small improvements become big rank-ups.",
+"Stay calm, rotate smart, hit clean.",
+"Your next best game is still ahead of you.",
+"Focus on decisions, not just the scoreboard.",
+"Don't chase the rank. Build the player who earns it.",
+"One clean touch can change the whole play.",
+"Adapt, recover, go again.",
+"Win the next challenge. Then the next.",
+"Progress isn't always a straight line. Keep going."
+];
+const today=new Date();
+const dayIndex=Math.floor(Date.UTC(today.getFullYear(),today.getMonth(),today.getDate())/86400000);
+$("quote").textContent="“"+quotes[((dayIndex%quotes.length)+quotes.length)%quotes.length]+"”";
+$("quoteDay").textContent=today.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+$("rank").innerHTML=ranks.map(r=>`<option>${r}</option>`).join("");
+function blank(){return {rank:"Platinum II",division:2,mmr:"",matches:[]};}
 let data;
 try {
-  data = JSON.parse(localStorage.getItem("rl-tracker-data")) ||
-    {rank:"Platinum II", mode:"2v2", matches:[]};
-} catch {
-  data = {rank:"Platinum II", mode:"2v2", matches:[]};
-}
-function save() {
-  localStorage.setItem("rl-tracker-data", JSON.stringify(data));
-  render();
-}
-function render() {
-  $("rank").textContent = data.rank;
-  $("rankSelect").value = data.rank;
-  $("mode").value = data.mode;
-  const matches = data.matches;
-  const wins = matches.filter(m => m.win).length;
-  $("played").textContent = matches.length;
-  $("wins").textContent = wins;
-  $("losses").textContent = matches.length - wins;
-  $("rate").textContent = matches.length
-    ? Math.round(wins / matches.length * 100) + "%" : "0%";
-  $("history").innerHTML = "";
-  if (!matches.length) {
-    $("history").textContent = "Brak rozegranych meczów.";
-    return;
+ const old=JSON.parse(localStorage.getItem("rl-tracker-data")||"null");
+ data=JSON.parse(localStorage.getItem("rl-tracker-v2")||"null");
+ if(!data){
+  data={profiles:{"1v1":blank(),"2v2":blank(),"3v3":blank()},mode:"2v2"};
+  if(old){
+   data.profiles["2v2"].rank=ranks.includes(old.rank)?old.rank:"Platinum II";
+   data.profiles["2v2"].matches=Array.isArray(old.matches)?old.matches.map(m=>({...m,mode:"2v2",mmr:m.mmr??null})).filter(m=>typeof m.win==="boolean"):[];
   }
-  matches.forEach((m, i) => {
-    const row = document.createElement("div");
-    row.className = "match";
-    const info = document.createElement("span");
-    info.className = m.win ? "win" : "lose";
-    info.textContent = (m.win ? "WIN" : "LOSS") + " • " + m.mode;
-    const score = document.createElement("strong");
-    score.textContent = m.score || "Bez wyniku";
-    row.append(info, score);
-    $("history").append(row);
-  });
+ }
+} catch {data={profiles:{"1v1":blank(),"2v2":blank(),"3v3":blank()},mode:"2v2"};}
+for(const m of ["1v1","2v2","3v3"]){
+ if(!data.profiles[m])data.profiles[m]=blank();
+ const p=data.profiles[m];
+ if(!ranks.includes(p.rank))p.rank="Platinum II";
+ if(![1,2,3,4].includes(Number(p.division)))p.division=2;
+ if(!Array.isArray(p.matches))p.matches=[];
 }
-$("rankSelect").onchange = e => {data.rank=e.target.value;save();};
-$("mode").onchange = e => {data.mode=e.target.value;save();};
-function add(win) {
-  const score = $("score").value.trim();
-  if (score && !/^\d+\s*-\s*\d+$/.test(score)) {
-    alert("Wpisz wynik w formacie 3-1 albo zostaw puste.");
-    return;
-  }
-  data.matches.unshift({win, score, mode:data.mode, date:Date.now()});
-  $("score").value = "";
-  save();
+if(!["1v1","2v2","3v3"].includes(data.mode))data.mode="2v2";
+let mode=data.mode;
+function profile(){return data.profiles[mode];}
+function persist(){localStorage.setItem("rl-tracker-v2",JSON.stringify(data));}
+function rankIndex(r){return ranks.indexOf(r);}
+function renderChart(matches){
+ const svg=$("chart");
+ const points=matches.filter(m=>Number.isFinite(Number(m.mmr))&&m.mmr!==""&&m.mmr!==null).slice().reverse().slice(-20);
+ if(points.length<2){
+  svg.innerHTML='<path d="M10 130 H310" stroke="#263653" stroke-width="1" fill="none"/><text x="160" y="68" fill="#8e9db8" text-anchor="middle" font-size="10">MMR data appears here</text>';
+  $("chartNote").textContent=points.length===1?"One MMR entry saved. Add another to see the trend.":"Add match MMR values to build your graph.";
+  return;
+ }
+ const vals=points.map(p=>Number(p.mmr)),min=Math.min(...vals),max=Math.max(...vals),span=Math.max(max-min,20);
+ const coords=vals.map((v,i)=>({x:12+i*296/(vals.length-1),y:120-(v-(min-span*.1))/(span*1.2)*100}));
+ const poly=coords.map(p=>`${p.x},${p.y}`).join(" ");
+ const area=`12,130 ${poly} 308,130`;
+ const last=vals[vals.length-1]-vals[0];
+ svg.innerHTML=`<defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#57b8ff" stop-opacity=".3"/><stop offset="100%" stop-color="#57b8ff" stop-opacity="0"/></linearGradient></defs>
+ <path d="M10 30 H310 M10 75 H310 M10 120 H310" stroke="#263653" stroke-width="1" fill="none"/>
+ <polygon points="${area}" fill="url(#fill)"/>
+ <polyline points="${poly}" fill="none" stroke="#62caff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+ <circle cx="${coords.at(-1).x}" cy="${coords.at(-1).y}" r="4" fill="#78f0ff" stroke="#17324e" stroke-width="2"/>`;
+ $("chartNote").textContent=`${vals[0]} → ${vals.at(-1)} MMR · ${last>0?"+":""}${last} MMR overall`;
 }
-$("addWin").onclick = () => add(true);
-$("addLoss").onclick = () => add(false);
-$("clear").onclick = () => {
-  if (confirm("Usunąć całą historię meczów?")) {
-    data.matches = [];
-    save();
-  }
+function render(){
+ const p=profile(),ms=p.matches,w=ms.filter(m=>m.win).length,l=ms.length-w,rate=l+w?Math.round(w/ms.length*100):0;
+ $("heroMode").textContent=mode.toUpperCase();
+ $("heroRank").textContent=p.rank.replace(/ (I|II|III)$/,"");
+ $("heroDivision").textContent=p.rank==="Supersonic Legend"?"Top rank":`Division ${["","I","II","III","IV"][p.division]}`;
+ $("heroMMR").innerHTML=(p.mmr!==""&&p.mmr!==null?Number(p.mmr).toLocaleString("en-US"):"—")+' <small>MMR</small>';
+ $("heroWR").textContent=rate+"%";
+ $("rankbar").style.width=(p.rank==="Supersonic Legend"?100:(rankIndex(p.rank)+1)/ranks.length*100)+"%";
+ $("progressLeft").textContent=p.rank==="Supersonic Legend"?"Top rank reached":`Current: ${p.rank}`;
+ $("progressRight").textContent=`DIV ${p.division}`;
+ $("played").textContent=ms.length;$("wr").textContent=rate+"%";
+ $("wrDetail").textContent=ms.length?`${w}W · ${l}L`:"No matches yet";
+ $("wins").textContent=w;$("losses").textContent=l;
+ const streak=ms.slice(0,ms.length).slice(0,20);
+ let s=0;if(streak.length){const first=streak[0].win;for(const m of streak){if(m.win!==first)break;s++;}}
+ $("streak").textContent=s?(streak[0].win?`🔥 ${s} win streak`:`${s} loss streak`):"Start your streak";
+ $("modeLabel").textContent=mode+" stats";
+ $("historyCount").textContent=ms.length+" games";
+ $("history").innerHTML="";
+ if(!ms.length)$("history").innerHTML='<div class="empty">No matches yet.<br>Queue up, then log your first game.</div>';
+ ms.slice(0,30).forEach((m,i)=>{
+  const row=document.createElement("div");row.className="historyrow";
+  const dot=document.createElement("div");dot.className="resultdot "+(m.win?"w":"l");dot.textContent=m.win?"W":"L";
+  const info=document.createElement("div");info.className="matchinfo";
+  const title=document.createElement("div");title.className="matchtitle";title.textContent=(m.win?"Victory":"Defeat")+" · "+(m.mode||mode);
+  const date=document.createElement("div");date.className="matchdate";date.textContent=m.date?new Date(m.date).toLocaleString():"Previous match";
+  info.append(title,date);
+  const right=document.createElement("div");right.className="matchscore";
+  const score=document.createElement("div");score.textContent=m.score||"—";
+  const mmr=document.createElement("div");mmr.className="matchmmr";mmr.textContent=m.mmr!==null&&m.mmr!==""?Number(m.mmr).toLocaleString()+" MMR":"No MMR";
+  right.append(score,mmr);
+  const del=document.createElement("button");del.className="smallbtn";del.textContent="×";del.title="Delete match";del.onclick=()=>{if(confirm("Delete this match?")){p.matches.splice(i,1);persist();render();}};
+  row.append(dot,info,right,del);$("history").append(row);
+ });
+ renderChart(ms);
+}
+function loadProfile(){
+ const p=profile();$("rank").value=p.rank;$("division").value=String(p.division);$("mmr").value=p.mmr??"";
+ $("afterMMR").value="";$("score").value="";render();
+}
+$("mode").value=mode;
+$("mode").onchange=e=>{mode=e.target.value;data.mode=mode;loadProfile();persist();};
+$("saveRank").onclick=()=>{
+ const p=profile();p.rank=$("rank").value;p.division=Number($("division").value);
+ const v=$("mmr").value.trim();p.mmr=v===""?"":Math.max(0,Number(v));
+ persist();render();alert("Rank settings saved!");
 };
-render();
+function addMatch(win){
+ const p=profile(),score=$("score").value.trim(),after=$("afterMMR").value.trim();
+ if(score&&!/^\d+\s*-\s*\d+$/.test(score)){alert("Use score format 3-1, or leave it empty.");return;}
+ let mmr=after!==""?Math.max(0,Number(after)):(p.mmr!==""&&p.mmr!==null?Number(p.mmr):null);
+ if(mmr!==null)p.mmr=mmr;
+ p.matches.unshift({win,score,mode,mmr,date:Date.now()});
+ $("score").value="";$("afterMMR").value="";
+ persist();render();
+}
+$("addWin").onclick=()=>addMatch(true);
+$("addLoss").onclick=()=>addMatch(false);
+loadProfile();
 </script>
 </body>
-      </html>
-      
+</html>

@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10111b">
+  <title>Rocket League Tracker</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: #10111b; color: #f4f5ff;
+      font-family: system-ui, sans-serif; padding: 20px;
+    }
+    .app { max-width: 600px; margin: auto; }
+    h1 { font-size: 27px; margin-bottom: 4px; }
+    .muted { color: #999db8; }
+    .card {
+      background: #1b1d2c; border: 1px solid #30334b;
+      padding: 18px; border-radius: 17px; margin: 16px 0;
+    }
+    .rank { font-size: 30px; font-weight: 800; color: #70caff; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat { background: #25283a; padding: 14px; border-radius: 12px; }
+    .number { font-size: 24px; font-weight: 750; }
+    input, select, button {
+      width: 100%; padding: 13px; border-radius: 10px;
+      border: 1px solid #393d59; margin-top: 9px;
+      background: #141624; color: white; font: inherit;
+    }
+    button {
+      background: #56b9ff; color: #10111b;
+      border: none; font-weight: 750; cursor: pointer;
+    }
+    button.loss { background: #ff7189; }
+    .match {
+      display: flex; justify-content: space-between; gap: 10px;
+      padding: 12px 0; border-bottom: 1px solid #30334b;
+    }
+    .win { color: #65e6a2; } .lose { color: #ff7189; }
+    .small { font-size: 13px; }
+  </style>
+</head>
+<body>
+<main class="app">
+  <h1>🚀 RL TRACKER</h1>
+  <div class="muted">Twój Rocket League dashboard</div>
+
+  <section class="card">
+    <div class="muted">TWÓJ RANK</div>
+    <div class="rank" id="rank">Platinum II</div>
+    <label for="rankSelect">Ustaw aktualną rangę</label>
+    <select id="rankSelect">
+      <option>Bronze I</option><option>Bronze II</option>
+      <option>Bronze III</option><option>Silver I</option>
+      <option>Silver II</option><option>Silver III</option>
+      <option>Gold I</option><option>Gold II</option>
+      <option>Gold III</option><option>Platinum I</option>
+      <option selected>Platinum II</option><option>Platinum III</option>
+      <option>Diamond I</option><option>Diamond II</option>
+      <option>Diamond III</option><option>Champion I</option>
+      <option>Champion II</option><option>Champion III</option>
+      <option>Grand Champion I</option><option>Grand Champion II</option>
+      <option>Grand Champion III</option><option>Supersonic Legend</option>
+    </select>
+    <label for="mode">Tryb gry</label>
+    <select id="mode">
+      <option>2v2</option><option>1v1</option><option>3v3</option>
+    </select>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><div class="muted small">Rozegrane</div>
+      <div class="number" id="played">0</div></div>
+    <div class="stat"><div class="muted small">Win rate</div>
+      <div class="number" id="rate">0%</div></div>
+    <div class="stat"><div class="muted small">Wygrane</div>
+      <div class="number win" id="wins">0</div></div>
+    <div class="stat"><div class="muted small">Przegrane</div>
+      <div class="number lose" id="losses">0</div></div>
+  </section>
+
+  <section class="card">
+    <h3>📊 Dodaj mecz</h3>
+    <label for="score">Wynik meczu</label>
+    <input id="score" placeholder="Np. 3-1" maxlength="9">
+    <button id="addWin">✅ Wygrana</button>
+    <button id="addLoss" class="loss">❌ Przegrana</button>
+  </section>
+
+  <section class="card">
+    <h3>📜 Historia meczów</h3>
+    <button id="clear" style="background:#30334b;color:white">
+      Wyczyść historię
+    </button>
+    <div id="history" class="muted">Brak rozegranych meczów.</div>
+  </section>
+  <p class="muted small">RL Tracker • Statystyki zapisują się na tym urządzeniu.</p>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+let data;
+try {
+  data = JSON.parse(localStorage.getItem("rl-tracker-data")) ||
+    {rank:"Platinum II", mode:"2v2", matches:[]};
+} catch {
+  data = {rank:"Platinum II", mode:"2v2", matches:[]};
+}
+function save() {
+  localStorage.setItem("rl-tracker-data", JSON.stringify(data));
+  render();
+}
+function render() {
+  $("rank").textContent = data.rank;
+  $("rankSelect").value = data.rank;
+  $("mode").value = data.mode;
+  const matches = data.matches;
+  const wins = matches.filter(m => m.win).length;
+  $("played").textContent = matches.length;
+  $("wins").textContent = wins;
+  $("losses").textContent = matches.length - wins;
+  $("rate").textContent = matches.length
+    ? Math.round(wins / matches.length * 100) + "%" : "0%";
+  $("history").innerHTML = "";
+  if (!matches.length) {
+    $("history").textContent = "Brak rozegranych meczów.";
+    return;
+  }
+  matches.forEach((m, i) => {
+    const row = document.createElement("div");
+    row.className = "match";
+    const info = document.createElement("span");
+    info.className = m.win ? "win" : "lose";
+    info.textContent = (m.win ? "WIN" : "LOSS") + " • " + m.mode;
+    const score = document.createElement("strong");
+    score.textContent = m.score || "Bez wyniku";
+    row.append(info, score);
+    $("history").append(row);
+  });
+}
+$("rankSelect").onchange = e => {data.rank=e.target.value;save();};
+$("mode").onchange = e => {data.mode=e.target.value;save();};
+function add(win) {
+  const score = $("score").value.trim();
+  if (score && !/^\d+\s*-\s*\d+$/.test(score)) {
+    alert("Wpisz wynik w formacie 3-1 albo zostaw puste.");
+    return;
+  }
+  data.matches.unshift({win, score, mode:data.mode, date:Date.now()});
+  $("score").value = "";
+  save();
+}
+$("addWin").onclick = () => add(true);
+$("addLoss").onclick = () => add(false);
+$("clear").onclick = () => {
+  if (confirm("Usunąć całą historię meczów?")) {
+    data.matches = [];
+    save();
+  }
+};
+render();
+</script>
+</body>
+      </html>
+      
